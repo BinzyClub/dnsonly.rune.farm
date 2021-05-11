@@ -402,9 +402,13 @@ async function getBscPoolInfo(App, chefContract, chefAddress, poolIndex, pending
     };
   }
   const poolToken = await getBscToken(App, poolInfo.lpToken, chefAddress);
+
   const userInfo = await chefContract.userInfo(poolIndex, App.YOUR_ADDRESS);
   const pendingRewardTokens = await chefContract.callStatic[pendingRewardsFunction](poolIndex, App.YOUR_ADDRESS);
-  const staked = userInfo.amount / 10 ** poolToken.decimals;
+  // console.log('x', pendingRewardTokens)
+  // console.log('y', poolIndex, App.YOUR_ADDRESS, userInfo)
+  // console.log('z', poolIndex, App.YOUR_ADDRESS, userInfo.amount)
+  const staked = (userInfo.amount ? userInfo.amount : userInfo) / 10 ** poolToken.decimals;
   return {
       address: poolInfo.lpToken,
       allocPoints: poolInfo.allocPoint ?? 1,
@@ -428,7 +432,7 @@ async function loadBscChefContract(App, tokens, prices, chef, chefAddress, chefA
   _print(`Showing incentivized pools only.\n`);
 
   var tokens = {};
-console.log(chefContract.callStatic)
+
   const rewardTokenAddress = await chefContract.callStatic[rewardTokenFunction]();
   const rewardToken = await getBscToken(App, rewardTokenAddress, chefAddress);
   const rewardsPerWeek = rewardsPerWeekFixed ?? 

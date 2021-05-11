@@ -688,10 +688,10 @@ const chefContract_unstake = async function(chefAbi, chefAddress, poolIndex, App
   const signer = App.provider.getSigner()
   const CHEF_CONTRACT = new ethers.Contract(chefAddress, chefAbi, signer)
 
-  const currentStakedAmount = (await CHEF_CONTRACT.userInfo(poolIndex, App.YOUR_ADDRESS)).amount
+  const userInfo = (await CHEF_CONTRACT.userInfo(poolIndex, App.YOUR_ADDRESS))
+  const currentStakedAmount = userInfo.amount ? userInfo.amount : userInfo
   const earnedTokenAmount = await CHEF_CONTRACT.callStatic[pendingRewardsFunction](poolIndex, App.YOUR_ADDRESS) / 1e18
-
-  if (earnedTokenAmount > 0) {
+console.log(currentStakedAmount)
     showLoading()
     CHEF_CONTRACT.withdraw(poolIndex, currentStakedAmount, {gasLimit: 500000})
       .then(function(t) {
@@ -700,7 +700,6 @@ const chefContract_unstake = async function(chefAbi, chefAddress, poolIndex, App
       .catch(function() {
         hideLoading()
       })
-  }
 }
 
 const chefContract_claim = async function(chefAbi, chefAddress, poolIndex, App, 
@@ -736,8 +735,8 @@ const chefContract_emergencyWithdraw = async function(chefAbi, chefAddress, pool
 
   const CHEF_CONTRACT = new ethers.Contract(chefAddress, chefAbi, signer)
 
-  const currentStakedAmount = (await CHEF_CONTRACT.userInfo(poolIndex, App.YOUR_ADDRESS)).amount
-
+  const userInfo = (await CHEF_CONTRACT.userInfo(poolIndex, App.YOUR_ADDRESS))
+  const currentStakedAmount = userInfo.amount ? userInfo.amount : userInfo
   if (currentStakedAmount > 0) {
     showLoading()
     CHEF_CONTRACT.emergencyWithdraw(poolIndex, {gasLimit: 500000})
