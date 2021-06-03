@@ -423,7 +423,7 @@ async function loadBscChefContract(App, tokens, prices, chef, chefAddress, chefA
   deathPoolIndices) {
   const chefContract = chef ?? new ethers.Contract(chefAddress, chefAbi, App.provider);
 
-  const poolCount = parseInt(chefContract.poolLength ? await chefContract.poolLength() : 34, 10);
+  const poolCount = parseInt(chefContract.poolLength ? await chefContract.poolLength() : 45, 10);
   const totalAllocPoints = await chefContract.totalAllocPoint();
     
   _print(`<a href='https://bscscan.com/address/${chefAddress}' target='_blank'>Staking Contract</a>`);
