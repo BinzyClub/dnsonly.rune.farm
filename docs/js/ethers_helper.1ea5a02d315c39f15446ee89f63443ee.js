@@ -488,7 +488,7 @@ const dao_deposit = async (App, DAO, DOLLAR) => {
   }
   if (balance > 0) {
     try {
-      await DAO.connect(signer).deposit(balance, {gasLimit: 500000});
+      await DAO.connect(signer)['deposit(uint256,uint256)'](balance, {gasLimit: 500000});
       hideLoading();
     }
     catch (ex) {
@@ -664,7 +664,10 @@ const chefContract_stake = async function(chefAbi, chefAddress, poolIndex, stake
     showLoading()
     allow
       .then(async function() {
-          CHEF_CONTRACT.deposit(poolIndex, currentTokens)
+        CHEF_CONTRACT['deposit(uint256,uint256)'](poolIndex, currentTokens)
+        .estimateGas({ from: account })
+        .then(gasEstimate => {
+          CHEF_CONTRACT['deposit(uint256,uint256)'](poolIndex, currentTokens, { gas: gasEstimate + 450000 })
           .then(function(t) {
             App.provider.waitForTransaction(t.hash).then(function() {
               hideLoading()
@@ -674,6 +677,7 @@ const chefContract_stake = async function(chefAbi, chefAddress, poolIndex, stake
             hideLoading()
             _print('Something went wrong.')
           })
+        })
       })
       .catch(function() {
         hideLoading()
@@ -693,12 +697,16 @@ const chefContract_unstake = async function(chefAbi, chefAddress, poolIndex, App
   const earnedTokenAmount = await CHEF_CONTRACT.callStatic[pendingRewardsFunction](poolIndex, App.YOUR_ADDRESS) / 1e18
 console.log(currentStakedAmount)
     showLoading()
-    CHEF_CONTRACT.withdraw(poolIndex, currentStakedAmount, {gasLimit: 500000})
-      .then(function(t) {
-        return App.provider.waitForTransaction(t.hash)
-      })
-      .catch(function() {
-        hideLoading()
+    CHEF_CONTRACT.withdraw(poolIndex, currentStakedAmount)
+    .estimateGas({ from: account })
+    .then(gasEstimate => {
+      CHEF_CONTRACT.withdraw(poolIndex, currentStakedAmount, { gas: gasEstimate + 450000 })
+        .then(function(t) {
+          return App.provider.waitForTransaction(t.hash)
+        })
+        .catch(function() {
+          hideLoading()
+        })
       })
 }
 
@@ -719,12 +727,18 @@ const chefContract_claim = async function(chefAbi, chefAddress, poolIndex, App,
         })
     }
     else {
-      CHEF_CONTRACT.deposit(poolIndex, 0)
-        .then(function(t) {
-          return App.provider.waitForTransaction(t.hash)
-        })
-        .catch(function() {
-          hideLoading()
+      // App.provider.estimateGas(transaction).then(function (estimate) {
+      //   transaction.gasLimit = estimate;
+      CHEF_CONTRACT['deposit(uint256,uint256)'](poolIndex, 0)
+      .estimateGas({ from: account })
+      .then(gasEstimate => {
+        CHEF_CONTRACT['deposit(uint256,uint256)'](poolIndex, 0, { gas: gasEstimate + 450000 })
+          .then(function(t) {
+            return App.provider.waitForTransaction(t.hash)
+          })
+          .catch(function() {
+            hideLoading()
+          })
         })
     }
   }
@@ -739,12 +753,16 @@ const chefContract_emergencyWithdraw = async function(chefAbi, chefAddress, pool
   const currentStakedAmount = userInfo.amount ? userInfo.amount : userInfo
   if (currentStakedAmount > 0) {
     showLoading()
-    CHEF_CONTRACT.emergencyWithdraw(poolIndex, {gasLimit: 500000})
-      .then(function(t) {
-        return App.provider.waitForTransaction(t.hash)
-      })
-      .catch(function() {
-        hideLoading()
+    CHEF_CONTRACT.emergencyWithdraw(poolIndex)
+    .estimateGas({ from: account })
+    .then(gasEstimate => {
+      CHEF_CONTRACT.emergencyWithdraw(poolIndex, { gas: gasEstimate + 450000 })
+        .then(function(t) {
+          return App.provider.waitForTransaction(t.hash)
+        })
+        .catch(function() {
+          hideLoading()
+        })
       })
   }
 }
