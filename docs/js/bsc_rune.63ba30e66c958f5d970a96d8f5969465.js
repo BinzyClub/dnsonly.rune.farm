@@ -1418,7 +1418,7 @@ async function main() {
   const totalFarms = parseInt(window.location.hash.replace('#', '').split('-')[1])
 
   await loadBscChefContract(App, tokens, prices, RUNE_CHEF, RUNE_CHEF_ADDR, RUNE_CHEF_ABI, rewardTokenTicker,
-      "currentRune", null, rewardsPerWeek, "pendingRune(uint256,address)", totalFarms);
+      "currentRune", null, rewardsPerWeek, "pendingRune(uint256,address)", undefined, totalFarms);
 
   hideLoading();  
 }

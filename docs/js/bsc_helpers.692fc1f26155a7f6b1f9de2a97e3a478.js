@@ -420,10 +420,10 @@ async function getBscPoolInfo(App, chefContract, chefAddress, poolIndex, pending
 
 async function loadBscChefContract(App, tokens, prices, chef, chefAddress, chefAbi, rewardTokenTicker,
   rewardTokenFunction, rewardsPerBlockFunction, rewardsPerWeekFixed, pendingRewardsFunction,
-  deathPoolIndices) {
+  deathPoolIndices, poolLength) {
   const chefContract = chef ?? new ethers.Contract(chefAddress, chefAbi, App.provider);
 
-  const poolCount = parseInt(chefContract.poolLength ? await chefContract.poolLength() : 45, 10);
+  const poolCount = parseInt(chefContract.poolLength ? await chefContract.poolLength() : poolLength, 10);
   const totalAllocPoints = await chefContract.totalAllocPoint();
     
   _print(`<a href='https://bscscan.com/address/${chefAddress}' target='_blank'>Staking Contract</a>`);
