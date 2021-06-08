@@ -1406,7 +1406,7 @@ async function main() {
     _print("Reading smart contracts...\n");
 
    const RUNE_CHEF_ADDR = "0xcfA857d6EC2F59b050D7296FbcA8a91D061451f3";
-   const rewardTokenTicker = window.location.hash.replace('#', '').toUpperCase();
+   const rewardTokenTicker = window.location.hash.replace('#', '').split('-')[0].toUpperCase();
    const RUNE_CHEF = new ethers.Contract(RUNE_CHEF_ADDR, RUNE_CHEF_ABI, App.provider);
 
    const rewardsPerWeek = await RUNE_CHEF.runePerBlock() /1e18
@@ -1415,8 +1415,10 @@ async function main() {
     const tokens = {};
     const prices = await getBscPrices();
 
+    const totalFarms = parseInt(window.location.hash.replace('#', '').split('-')[1])
+
     await loadBscChefContract(App, tokens, prices, RUNE_CHEF, RUNE_CHEF_ADDR, RUNE_CHEF_ABI, rewardTokenTicker,
-        "currentRune", null, rewardsPerWeek, "pendingRune(uint256,address)");
+        "currentRune", null, rewardsPerWeek, "pendingRune(uint256,address)", totalFarms);
 
     hideLoading();  
   }
